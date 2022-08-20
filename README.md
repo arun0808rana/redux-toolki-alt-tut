@@ -1,5 +1,16 @@
 # Redux-toolkit Tutorial
 
+### Cloning instructions
+
+```bash
+git clone 'https://github.com/arun0808rana/redux-toolki-alt-tut.git'
+cd redux-toolki-alt-tut
+npm install
+npm start
+```
+
+### START HERE
+
 You still need to add redux and react-redux inspite of @reduxjs/toolkit
 
 ```js
@@ -156,7 +167,6 @@ function Profile() {
 
 export default Profile;
 ```
-
 
 ### Adding more reducers
 
