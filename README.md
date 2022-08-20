@@ -1,70 +1,158 @@
-# Getting Started with Create React App
+# Redux-toolkit Tutorial
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+You still need to add redux and react-redux inspite of @reduxjs/toolkit
 
-## Available Scripts
+```js
+npm install redux react-redux @reduxjs/toolkit
+```
 
-In the project directory, you can run:
+Slices come under `/features` folder. Eg. `/features/userSlice.js`
 
-### `npm start`
+> Try naming slices with `Slice` as suffixes for better recognition
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Editing index.js file
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```js
+// ------------index.js-------------
 
-### `npm test`
+import { Provider } from 'react-redux';
+// notice it is different than redux
+// infact redux nowadays throws depreciation err
+import { configureStore } from '@reduxjs/toolkit';
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+// redux toolkit enforces the name features for making slices
+// in features/user, user is the slice, should have been userSlice
+// for better readability
+import userReducer from './features/user';
 
-### `npm run build`
+// abstract store to a separate file for separation of concerns
+// and better readability
+const store = configureStore({
+  reducer: {
+    // user is the name of the reducer
+    user: userReducer,
+    // you can add multiple reducers here and name them
+  }
+});
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <Provider store={store}>
+    <App />
+  </Provider>
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Adding userSlice.js file inside `features` directory
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```js
+import { createSlice } from "@reduxjs/toolkit";
 
-### `npm run eject`
+const initialState = {
+  value: {
+    name: "",
+    age: 0,
+    email: "",
+  },
+};
+const userSlice = createSlice({
+  name: "user",
+  initialState,
+  //   this is where it differs in a weird way than redux
+  reducers: {
+    login: (state, action) => {
+      return {
+        ...state,
+        // action has type and payload
+        // action type will be similar to "user/login", wher user
+        // reducer is 'user' is reducer and 'login' is
+        // action-creator
+        value: action.payload,
+      };
+      //   we can reutrn the new state
+      //   or we can do like this
+      //   state = initialState
+      //   but then it would not copy
+      //   deep state values and hence i used
+      // ...state to make deep copy
+      // confirm this method with the official doc
+    },
+    logout: (state, action) => {
+      return initialState;
+    },
+  },
+});
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+console.log(userSlice, "userSlice");
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+// exporting action creaters
+// export these so that you can import them
+// to where you want to dispatch them from using useDispatch hook
+export const { login, logout } = userSlice.actions;
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+// exporting it as default for index.js
+// there you can name it anything since its a default export
+// it is used inside configureStore() fn
+export default userSlice.reducer;
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Dispatching actions
 
-## Learn More
+```js
+import React from "react";
+// still same as redux
+import { useDispatch } from "react-redux";
+// importing action creators
+import { login } from "../features/user";
+import { logout } from "../features/user";
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+function Login() {
+  const dispatch = useDispatch();
+  const handleLogin = () => {
+    //   calling action creators
+    //   inside dispatch and passing
+    //   payload
+    dispatch(
+      login({
+        name: "arun",
+        age: 29,
+        email: "arungmail",
+      })
+    );
+  };
+  const handleLogout = () => {
+    dispatch(logout());
+  };
+  return (
+    <div>
+      <button onClick={handleLogin}>Login</button>
+      <button onClick={handleLogout}>Logout</button>
+    </div>
+  );
+}
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+export default Login;
+```
 
-### Code Splitting
+### Consuming in components
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```js
+import React from "react";
+//  still using react-redux for useSelector
+import { useSelector } from "react-redux";
 
-### Analyzing the Bundle Size
+function Profile() {
+  // still same like redux
+  // user in state.user.value is reducer
+  const user = useSelector((state) => state.user.value);
+  return (
+    <div>
+      <h1>Profile Page</h1>
+      <p>Name:{user.name}</p>
+      <p>Email: {user.email}</p>
+      <p>Age: {user.age}</p>
+    </div>
+  );
+}
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+export default Profile;
+```
