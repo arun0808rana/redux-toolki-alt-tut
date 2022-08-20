@@ -8,6 +8,7 @@ cd redux-toolki-alt-tut
 code .
 npm install
 npm start
+exit
 ```
 
 ### START HERE
