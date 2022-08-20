@@ -156,3 +156,13 @@ function Profile() {
 
 export default Profile;
 ```
+
+
+### Adding more reducers
+
+1. Make `slice` file.
+2. This way you isolate reducer, state, actions, and actions creators in one place i.e a slice.
+3. Export it.
+4. Import it in `index.js`.
+5. Add the import to the `reducer` key inside `configureStore` .
+6. Use a key-value pair for adding reducer.
