@@ -5,6 +5,7 @@
 ```bash
 git clone 'https://github.com/arun0808rana/redux-toolki-alt-tut.git'
 cd redux-toolki-alt-tut
+code .
 npm install
 npm start
 ```
